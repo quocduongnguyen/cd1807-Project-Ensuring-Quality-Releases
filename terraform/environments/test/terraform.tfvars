@@ -5,9 +5,9 @@ client_secret = "2CxYFGyH--sG5GZugeBkifmK5gAjwtf7Bm"
 tenant_id = "dbe40337-7a36-4142-8c42-ba9cc842da11"
 
 # Resource Group/Location
-location = ""
-resource_group_name = ""
-application_type = ""
+location = "centralus"
+resource_group_name = "duongnq9-project3-devops"
+application_type = "myApplication"
 
 # Network
 virtual_network_name = ""
