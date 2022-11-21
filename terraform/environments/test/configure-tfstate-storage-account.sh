@@ -1,5 +1,5 @@
 #!/bin/bash
-RESOURCE_GROUP_NAME="duongnq9-project1-devops-rg"
+RESOURCE_GROUP_NAME="duongnq9-project3-devops-rg"
 STORAGE_ACCOUNT_NAME="tfstate$RANDOM$RANDOM"
 CONTAINER_NAME="tfstate"
 
