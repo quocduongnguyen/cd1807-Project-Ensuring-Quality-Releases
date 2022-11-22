@@ -6,7 +6,9 @@ variable "tenant_id" {}
 
 # Resource Group/Location
 variable "location" {}
-variable "resource_group" {}
+variable "resource_group" {
+    default = "duongnq9-project3-devops-rg"
+}
 variable "application_type" {}
 
 # Network
