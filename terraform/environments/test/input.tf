@@ -9,6 +9,7 @@ variable "location" {}
 variable "resource_group" {
     default = "duongnq9-project3-devops-rg"
 }
+variable "resource_group_name" {}
 variable "application_type" {}
 
 # Network
