@@ -6,8 +6,9 @@ tenant_id = "dbe40337-7a36-4142-8c42-ba9cc842da11"
 
 # Resource Group/Location
 location = "centralus"
-resource_group_name = "duongnq9-project3-devops-rg"
-application_type = "myApplication"
+resource_group = "duongnq9-project3-devops-rg2"
+resource_group_name = "duongnq9-project3-devops-rg2"
+application_type = "DuongNQ9Application"
 
 # Network
 virtual_network_name = ""
