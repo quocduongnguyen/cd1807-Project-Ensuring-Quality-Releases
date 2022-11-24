@@ -141,7 +141,7 @@ stages:
     # Selenium Test Suite - Publish the package  
     - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-uitests.zip   # Same as the archiveFile artifact above. 
       displayName: 'Upload Package'
-      artifact: drop-uitests
+      artifact: drop-ui-tests
 
     #--------------------------------------------#    
     # FakeRestAPI - Archive
@@ -149,7 +149,7 @@ stages:
     - task: ArchiveFiles@2
       displayName: 'Archive FakeRestAPI'
       inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/fakerestapi'
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter/fakerestapi'
         includeRootFolder:  false
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-fakerestapi.zip'
@@ -164,14 +164,14 @@ stages:
     - task: ArchiveFiles@2
       displayName: 'Archive PerformanceTestSuite'
       inputs:
-        rootFolderOrFile: 
-        includeRootFolder:
-        archiveType: 
-        archiveFile: 
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/jmeter'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-jmeter.zip'
     # JMeter Test Suite - Publish    
-    - publish: 
-      displayName: 
-      artifact: 
+    - publish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-jmeter.zip'
+      displayName: 'Publish JMeter'
+      artifact: drop-jmeter
 
 #--------------------------------------------#  
 # DEPLOYMENT STAGE
@@ -192,19 +192,21 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Deploy Azure Web App'
             inputs:
-              azureSubscription:      # ToDo
+              azureSubscription: $(azureServiceConnectionId)
               appName:                # ToDo
               appType: webApp
-              package: $(Pipeline.Workspace)/<artifact>/<archiveFile>       # ToDo: Use the published zip artifact. 
+              package: $(Pipeline.Workspace)/drop-fakerestapi/$(Build.BuildId)-fakerestapi.zip
           #--------------------------------------------#    
           # Run JMeter test suite against the App Service
           # ToDo: Update the script below to install jmeter, unzip the jmeter test suite published zip artifact, and run the PerformanceTestSuite.  
           # ToDo: Generate the log file. 
-          - task: CmdLine@2
-            inputs:
-              script: |
-                                                                            # ToDo: Write your commands
-              workingDirectory: $(Pipeline.Workspace)/<artifact>            # ToDo: Use the artifact name from the task above
+          # - task: CmdLine@2
+          #   inputs:
+          #     script: |
+          #       cd
+          #       dir
+          #       powershell -command
+          #     workingDirectory: $(Pipeline.Workspace)/drop-fakerestapi      
               
   #--------------------------------------------#  
   # Selenium | Functional UI Tests
@@ -220,7 +222,7 @@ stages:
         deploy:
           steps:
           - download: current
-            artifact: drop-ui-tests     # ToDo: Change/provide a name
+            artifact: drop-ui-tests
             
           - task: Bash@3
             inputs:
