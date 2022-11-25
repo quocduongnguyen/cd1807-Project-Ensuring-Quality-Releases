@@ -216,7 +216,6 @@ stages:
     environment:
       name: $(environmentName)
       resourceType: VirtualMachine
-      tags: selenium
     strategy:
       runOnce:
         deploy:
