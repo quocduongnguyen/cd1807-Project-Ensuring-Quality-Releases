@@ -214,7 +214,7 @@ stages:
   - deployment: VMDeploy
     displayName: Selenium Tests
     environment:
-      name: duongnq9-project3-devops-linux-vm
+      name: $(environmentName)
       resourceType: VirtualMachine
       tags: selenium
     strategy:
