@@ -226,7 +226,7 @@ stages:
           - task: Bash@3
             inputs:
               targetType: 'inline'
-              script: |           
+              script: |
                 # ToDo: Install Selenium, Chromium-browser & Chromedriver, if not already in the custom VM image. 
                 #! /bin/bash
                 
