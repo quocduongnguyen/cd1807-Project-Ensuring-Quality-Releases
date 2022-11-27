@@ -38,7 +38,7 @@ stages:
     
     # Run Terraform Init on the pipeline agent 
     # ToDo: Replace the resource group name, storage account name, and container name below
-    - task: TerraformCLI@0
+    - task: TerraformTaskV3@3
       displayName: 'Terrafom init'
       inputs:
         provider: 'azurerm'
@@ -231,13 +231,62 @@ stages:
                 #! /bin/bash
                 
                 sudo apt-get upgrade -y
+                sudo apt-get install python3-pip -y
                 sudo apt-get install unzip -y
                 sudo apt-get install -y chromium-browser
-                pip install selenium
+                sudo apt-get install -y chromium-chromedriver
+                pip3 install selenium
                 
                 #  ToDo: Add chromedriver executable to path
-                export PATH=$PATH:/path/to/chromedriver     
+                export PATH=$PATH:/path/to/chromedriver
+                ls -la
+                rm chromedriver*
+                ls -la
+                wget "https://chromedriver.storage.googleapis.com/105.0.5195.52/chromedriver_linux64.zip"
+                pwd
+                echo $PATH
+                ls -la
                 
                 # ToDo: Write commands for deploying the UI Test Suite (published zip artifact) to the linux VM and execute the Test Suite
                 # ToDo: Direct the output of the Selenium Test Suite to a log file
+          - task: ExtractFiles@1
+            displayName: 'Extract Files'
+            inputs:
+              archiveFilePatterns: '*chromedriver_linux64.zip'
+              destinationFolder: '$(System.DefaultWorkingDirectory)'
+              cleanDestinationFolder: false
+          - task: Bash@3
+            displayName: 'Copy Files to bin'
+            inputs:
+              targetType: 'inline'
+              script: |
+                #! /bin/bash
+                sudo cp chromedriver /usr/bin
+                pwd
+                echo $PATH
+                ls -la
+                echo "Completed Copying"
+          - task: Bash@3
+            displayName: 'Running Selenium Test'
+            inputs:
+              targetType: 'inline'
+              script: |
+                #! /bin/bash
+                unzip -o $(Pipeline.Workspace)/drop-uitests/$(Build.BuildId)-uitests.zip -d .
+                pwd
+                echo $PATH
+                ls -la
+                sudo mkdir -p /var/logs/selenium && sudo chmod 664 /var/logs/selenium
+                python3 login.py 2>&1 | sudo tee -a /var/logs/selenium/ui_tests.log
+                ls -la
+                cd $(System.DefaultWorkingDirectory)
+                mkdir -p logs/selenium
+                sudo cp /var/logs/selenium/ui_tests.log logs/selenium/ui_tests.log
+                sudo chmod 775 logs/selenium/ui_tests.log
+                cat logs/selenium/ui_tests.log
+          - task: PublishPipelineArtifact@1
+            displayName: Publish logs from Selenium tests
+            inputs:
+              targetPath: '$(System.DefaultWorkingDirectory)/logs/selenium/ui_tests.log'
+              artifactName: 'drop-selenium-log'
                 
