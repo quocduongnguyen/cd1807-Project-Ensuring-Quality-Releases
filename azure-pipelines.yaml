@@ -10,7 +10,7 @@ trigger:
 # Otherwise, comment out the line below. 
 pool: 
   #vmImage: "ubuntu-latest"
-  name: 'duongnq9-pool' 
+  name: 'duongnq9-pool'
 
 variables:
   python.version: '3.7.6'
