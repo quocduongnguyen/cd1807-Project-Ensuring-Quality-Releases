@@ -52,14 +52,14 @@ module "publicip" {
   resource_type    = "publicip"
   resource_group   = "${module.resource_group.resource_group_name}"
 }
-# module "virtual_machine" {
-#   source               = "../../modules/vm"
-#   location             = "${var.location}"
-#   resource_group       = "${var.resource_group}"
-#   application_type     = "${var.application_type}"
-#   virtual_network_name = "${var.virtual_network_name}"
-#   address_prefix_test  = "${var.address_prefix_test}"
-#   address_space        = "${var.address_space}"
-#   subnet_id            = "${module.network.subnet_id_test}"
-#   public_ip_address_id = "${module.publicip.public_ip_address_id}"
-# }
+module "virtual_machine" {
+  source               = "../../modules/vm"
+  location             = "${var.location}"
+  resource_group       = "${var.resource_group}"
+  application_type     = "${var.application_type}"
+  virtual_network_name = "${var.virtual_network_name}"
+  address_prefix_test  = "${var.address_prefix_test}"
+  address_space        = "${var.address_space}"
+  subnet_id            = "${module.network.subnet_id_test}"
+  public_ip_address_id = "${module.publicip.public_ip_address_id}"
+}
