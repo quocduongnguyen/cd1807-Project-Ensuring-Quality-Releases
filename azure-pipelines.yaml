@@ -210,9 +210,9 @@ stages:
           #       powershell -command
           #     workingDirectory: $(Pipeline.Workspace)/drop-fakerestapi      
               
- #--------------------------------------------#  
- # Selenium | Functional UI Tests
- # ToDo: 
+  #--------------------------------------------#  
+  # Selenium | Functional UI Tests
+  # ToDo: 
   - deployment: DeployVM
     condition: true
     displayName: Deploy VM and execute Selenium tests
