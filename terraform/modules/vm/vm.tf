@@ -1,5 +1,5 @@
 resource "azurerm_network_interface" "test" {
-  name                = "duongnq9-project3-devops-linux-ni"
+  name                = "duongnq9-project3-devops-ni"
   location            = var.location
   resource_group_name = var.resource_group
 
@@ -12,7 +12,7 @@ resource "azurerm_network_interface" "test" {
 }
 
 resource "azurerm_linux_virtual_machine" "test" {
-  name                = "duongnq9-project3-devops-vm"
+  name                = "duongnq9-project3-devops-linux-vm"
   location            = var.location
   resource_group_name = var.resource_group
   size                = "Standard_B1ls"
