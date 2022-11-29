@@ -213,63 +213,39 @@ stages:
   #--------------------------------------------#  
   # Selenium | Functional UI Tests
   # ToDo: 
-  - deployment: DeployVM
-    condition: true
-    displayName: Deploy VM and execute Selenium tests
-    workspace:
-      clean: all
+  - deployment: VMDeploy
+    displayName: Selenium Tests
     environment:
-      name: '$(environmentName)'
+      name:  $(environmentName)       # ToDo: Change/provide a name
       resourceType: VirtualMachine
     strategy:
       runOnce:
         deploy:
           steps:
           - download: current
-            artifact: 'drop-ui-tests'    
+            artifact: drop-ui-tests    # ToDo: Change/provide a name
+            
           - task: Bash@3
-            displayName: 'Deploy VM'
             inputs:
               targetType: 'inline'
               script: |           
-                pwd
-                pip3 install selenium
-                wget https://chromedriver.storage.googleapis.com/107.0.5304.62/chromedriver_linux64.zip
-                unzip chromedriver_linux64.zip 
-                sudo chmod +x ./chromedriver
-              workingDirectory: $(System.DefaultWorkingDirectory)
-          - download: current
-            displayName: 'Download selenium tests'
-            artifact: drop-ui-tests
-          - task: Bash@3
-            displayName: 'Execute selenium tests'
-            inputs:
-              targetType: 'inline'
-              script: |
-                echo '------------> current path' 
-                pwd
-                unzip -o $(Pipeline.Workspace)/drop-ui-tests/$(Build.BuildId)-ui-tests.zip -d .
-                echo '------------> list of file' 
-                ls
-                python3 login.py > ui-logs$(Build.BuildId).log
-                ls
-                sudo mkdir /var/logs
-                sudo mkdir /var/logs/selenium
-                sudo cp ui-logs$(Build.BuildId).log /var/logs/selenium
-                echo '------------> Copy log files to folder log successfully'
-                sudo ls /var/logs/selenium
-              workingDirectory: $(System.DefaultWorkingDirectory)
-          - task: PublishPipelineArtifact@1
-            displayName: Publish selenium logs
-            inputs:
-              targetPath: '$(System.DefaultWorkingDirectory)/ui-logs$(Build.BuildId).log'
-              artifactName: 'drop-selenium-logs'
-
-#--------------------------------------------#
-# Integration Test
-#--------------------------------------------#
-- stage: IntegrationTest
-  displayName: Integration Test
+                # ToDo: Install Selenium, Chromium-browser & Chromedriver, if not already in the custom VM image. 
+                #! /bin/bash
+                
+                sudo apt-get upgrade -y
+                sudo apt-get install unzip -y
+                sudo apt-get install -y chromium-browser
+                pip install selenium
+                
+                #  ToDo: Add chromedriver executable to path
+                # wget https://chromedriver.storage.googleapis.com/106.0.5249.61/chromedriver_linux64.zip
+                # unzip chromedriver_linux64.zip 
+                # sudo chmod +x chromedriver
+                # mv chromedriver $(System.DefaultWorkingDirectory)/automatedtesting/selenium/
+                # chromium-browser -version
+                # chromedriver --version
+- stage: IntegrationTests
+  displayName: Integration Tests
   jobs:
   - job: PostmanTests
     displayName: Postman Tests
@@ -282,7 +258,7 @@ stages:
     - task: CmdLine@2
       displayName: Install Newman
       inputs:
-        script: 'npm install -g newman'
+        script: 'npm install -g newman'          # ToDo: Write your commands to install newman
         workingDirectory: $(System.DefaultWorkingDirectory)
     - task: CmdLine@2
       displayName: Run Regression Tests
@@ -325,16 +301,16 @@ stages:
 
     - bash: |
         $(System.DefaultWorkingDirectory)/apache-jmeter-5.4/bin/jmeter -n -t automatedtesting/jmeter/StressTestSuite.jmx \
-                                        -l $(System.DefaultWorkingDirectory)/log/jmeter/stress-test-result.csv \
-                                        -e -f -o $(System.DefaultWorkingDirectory)/log/jmeter/stress-test-html-report \
-                                        -j $(System.DefaultWorkingDirectory)/log/jmeter/jmeter-stress-test.log
+                                       -l $(System.DefaultWorkingDirectory)/log/jmeter/stress-test-result.csv \
+                                       -e -f -o $(System.DefaultWorkingDirectory)/log/jmeter/stress-test-html-report \
+                                       -j $(System.DefaultWorkingDirectory)/log/jmeter/jmeter-stress-test.log
       displayName: JMeter stress test
       workingDirectory: '$(System.DefaultWorkingDirectory)'
     - bash: |
         $(System.DefaultWorkingDirectory)/apache-jmeter-5.4/bin/jmeter -n -t automatedtesting/jmeter/EnduranceTestSuite.jmx \
-                                        -l $(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-result.csv \
-                                        -e -f -o $(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-html-report \
-                                        -j $(System.DefaultWorkingDirectory)/log/jmeter/jmeter-endurance-test.log
+                                       -l $(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-result.csv \
+                                       -e -f -o $(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-html-report \
+                                       -j $(System.DefaultWorkingDirectory)/log/jmeter/jmeter-endurance-test.log
       displayName: JMeter Endurance test
       workingDirectory: '$(System.DefaultWorkingDirectory)'
     - task: ArchiveFiles@2
@@ -380,4 +356,3 @@ stages:
       inputs:
         targetPath: '$(System.DefaultWorkingDirectory)/ui.log'
         artifactName: 'drop-selenium-logs'
-            
