@@ -233,10 +233,9 @@ stages:
                 #! /bin/bash
                 
                 sudo apt-get upgrade -y
-                sudo apt-get install python3-pip -y
                 sudo apt-get install unzip -y
                 sudo apt-get install -y chromium-browser
-                pip3 install selenium
+                pip install selenium
                 
                 #  ToDo: Add chromedriver executable to path
                 # wget https://chromedriver.storage.googleapis.com/106.0.5249.61/chromedriver_linux64.zip
