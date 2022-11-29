@@ -210,87 +210,61 @@ stages:
           #       powershell -command
           #     workingDirectory: $(Pipeline.Workspace)/drop-fakerestapi      
               
-  #--------------------------------------------#  
-  # Selenium | Functional UI Tests
-  # ToDo: 
-  - deployment: VMDeploy
-    displayName: Selenium Tests
+ #--------------------------------------------#  
+ # Selenium | Functional UI Tests
+ # ToDo: 
+  - deployment: DeployVM
+    condition: true
+    displayName: Deploy VM and execute Selenium tests
+    workspace:
+      clean: all
     environment:
-      name: $(environmentName)
+      name: '$(environmentName)'
       resourceType: VirtualMachine
+      tags: selenium
     strategy:
       runOnce:
         deploy:
           steps:
           - download: current
-            artifact: drop-ui-tests
-            
+            artifact: 'drop-ui-tests'    
           - task: Bash@3
+            displayName: 'Deploy VM'
             inputs:
               targetType: 'inline'
-              script: |
-                # ToDo: Install Selenium, Chromium-browser & Chromedriver, if not already in the custom VM image. 
-                #! /bin/bash
-                
-                sudo apt-get upgrade -y
-                sudo apt-get install python3-pip -y
-                sudo apt-get install unzip -y
-                sudo apt-get install -y chromium-browser
-                sudo apt-get install -y chromium-chromedriver
+              script: |           
+                pwd
                 pip3 install selenium
-                
-                #  ToDo: Add chromedriver executable to path
-                export PATH=$PATH:/path/to/chromedriver
-                ls -la
-                rm chromedriver*
-                ls -la
-                wget "https://chromedriver.storage.googleapis.com/105.0.5195.52/chromedriver_linux64.zip"
-                pwd
-                echo $PATH
-                ls -la
-                
-                # ToDo: Write commands for deploying the UI Test Suite (published zip artifact) to the linux VM and execute the Test Suite
-                # ToDo: Direct the output of the Selenium Test Suite to a log file
-          - task: ExtractFiles@1
-            displayName: 'Extract Files'
-            inputs:
-              archiveFilePatterns: '*chromedriver_linux64.zip'
-              destinationFolder: '$(System.DefaultWorkingDirectory)'
-              cleanDestinationFolder: false
+                wget https://chromedriver.storage.googleapis.com/107.0.5304.62/chromedriver_linux64.zip
+                unzip chromedriver_linux64.zip 
+                sudo chmod +x ./chromedriver
+              workingDirectory: $(System.DefaultWorkingDirectory)
+          - download: current
+            displayName: 'Download selenium tests'
+            artifact: drop-ui-tests
           - task: Bash@3
-            displayName: 'Copy Files to bin'
+            displayName: 'Execute selenium tests'
             inputs:
               targetType: 'inline'
               script: |
-                #! /bin/bash
-                sudo cp chromedriver /usr/bin
+                echo '------------> current path' 
                 pwd
-                echo $PATH
-                ls -la
-                echo "Completed Copying"
-          - task: Bash@3
-            displayName: 'Running Selenium Test'
-            inputs:
-              targetType: 'inline'
-              script: |
-                #! /bin/bash
-                unzip -o $(Pipeline.Workspace)/drop-ui-tests/$(Build.BuildId)-uitests.zip -d .
-                pwd
-                echo $PATH
-                ls -la
-                sudo mkdir -p /var/logs/selenium && sudo chmod 664 /var/logs/selenium
-                python3 login.py 2>&1 | sudo tee -a /var/logs/selenium/ui_tests.log
-                ls -la
-                cd $(System.DefaultWorkingDirectory)
-                mkdir -p logs/selenium
-                sudo cp /var/logs/selenium/ui_tests.log logs/selenium/ui_tests.log
-                sudo chmod 775 logs/selenium/ui_tests.log
-                cat logs/selenium/ui_tests.log
+                unzip -o $(Pipeline.Workspace)/drop-ui-tests/$(Build.BuildId)-ui-tests.zip -d .
+                echo '------------> list of file' 
+                ls
+                python3 login.py > ui-logs$(Build.BuildId).log
+                ls
+                sudo mkdir /var/logs
+                sudo mkdir /var/logs/selenium
+                sudo cp ui-logs$(Build.BuildId).log /var/logs/selenium
+                echo '------------> Copy log files to folder log successfully'
+                sudo ls /var/logs/selenium
+              workingDirectory: $(System.DefaultWorkingDirectory)
           - task: PublishPipelineArtifact@1
-            displayName: Publish logs from Selenium tests
+            displayName: Publish selenium logs
             inputs:
-              targetPath: '$(System.DefaultWorkingDirectory)/logs/selenium/ui_tests.log'
-              artifactName: 'drop-selenium-log'
+              targetPath: '$(System.DefaultWorkingDirectory)/ui-logs$(Build.BuildId).log'
+              artifactName: 'drop-selenium-logs'
 
 #--------------------------------------------#
 # Integration Test
