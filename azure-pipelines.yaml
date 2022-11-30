@@ -224,7 +224,6 @@ stages:
           steps:
           - download: current
             artifact: drop-ui-tests    # ToDo: Change/provide a name
-            
           - task: Bash@3
             displayName: 'Install Selenium'
             inputs:
@@ -241,3 +240,17 @@ stages:
                 export PATH=$PATH:/usr/lib/chromium-browser/
                 cd $(Pipeline.Workspace)/selenium
                 unzip -o $(Pipeline.Workspace)/selenium/$(Build.BuildId)-selenium-tests -d .
+          - bash: |
+                cd $(Pipeline.Workspace)/s/automatedtesting/selenium
+                rm -rf seleniumtestrun.log
+                pwd
+                python3 login.py
+                ls -lah
+                sudo cat seleniumtestrun.log
+                sudo cp seleniumtestrun.log /var/log/selenium/
+            displayName: Run Selenium Test-Suite
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Selenium Result logs
+            inputs:
+              targetPath: '$(Pipeline.Workspace)/selenium/seleniumtestrun.log'
+              artifactName: 'SeleniumTestResult'
