@@ -267,6 +267,23 @@ stages:
     condition: true
     displayName: 'Test Postman'
     steps:
+    - download: current
+      displayName: Download postman
+      artifact: postman
+    - task: NodeTool@0
+      displayName: Install Node v16.X
+      inputs:
+        versionSpec: '16.x'
+    - task: ArchiveFiles@2
+      displayName: 'Archive Postman tests'
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-postman-tests.zip'
+    - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-postman-tests.zip
+      displayName: 'Upload Postman Tests'
+      artifact: postman
     - task: CmdLine@2
       displayName: Install Newman
       inputs:
@@ -276,6 +293,8 @@ stages:
           export PATH=~/.npm-global/bin:$PATH
           source ~/.profile
           npm install -g newman
+          cd $(Pipeline.Workspace)/postman
+          unzip -o $(Pipeline.Workspace)/postman/$(Build.BuildId)-postman-tests -d .
         workingDirectory: $(System.DefaultWorkingDirectory)
 
    # Postman Data Validation Test Suite    
