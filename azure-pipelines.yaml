@@ -231,18 +231,18 @@ stages:
               script: |
                 #! /bin/bash
                 
-                sudo apt-get update -y
-                sudo apt-get install python3-pip -y
-                sudo apt-get install unzip -y
-                sudo apt-get install -y chromium-browser
-                sudo apt-get install -y chromium-chromedriver
-                sudo python3 -m pip install --upgrade pip
-                sudo pip3 install selenium==3.141.0 
+                # sudo apt-get update -y
+                # sudo apt-get install python3-pip -y
+                # sudo apt-get install unzip -y
+                # sudo apt-get install -y chromium-browser
+                # sudo apt-get install -y chromium-chromedriver
+                # sudo python3 -m pip install --upgrade pip
+                # sudo pip3 install selenium==3.141.0 
                 export PATH=$PATH:/usr/lib/chromium-browser/
                 cd $(Pipeline.Workspace)/drop-ui-tests
                 unzip -o $(Pipeline.Workspace)/drop-ui-tests/$(Build.BuildId)-uitests.zip -d .
           - bash: |
-                cd $(Pipeline.Workspace)/s/automatedtesting/selenium
+                #cd $(Pipeline.Workspace)/s/automatedtesting/selenium
                 rm -rf seleniumtestrun.log
                 pwd
                 python3 login.py
