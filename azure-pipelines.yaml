@@ -267,9 +267,6 @@ stages:
     condition: true
     displayName: 'Test Postman'
     steps:
-    - download: current
-      displayName: Download postman
-      artifact: postman
     - task: NodeTool@0
       displayName: Install Node v16.X
       inputs:
@@ -284,14 +281,19 @@ stages:
     - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-postman-tests.zip
       displayName: 'Upload Postman Tests'
       artifact: postman
+    - download: current
+      displayName: Download postman
+      artifact: postman
     - task: CmdLine@2
       displayName: Install Newman
       inputs:
         script: |
-          mkdir ~/.npm-global
+          #mkdir ~/.npm-global
           npm config set prefix '~/.npm-global'
           export PATH=~/.npm-global/bin:$PATH
           source ~/.profile
+          sudo apt install nodejs npm -y
+          nodejs --version
           npm install -g newman
           cd $(Pipeline.Workspace)/postman
           unzip -o $(Pipeline.Workspace)/postman/$(Build.BuildId)-postman-tests -d .
