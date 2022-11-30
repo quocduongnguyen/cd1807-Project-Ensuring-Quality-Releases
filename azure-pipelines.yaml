@@ -238,10 +238,11 @@ stages:
                 sudo python3 -m pip install --upgrade pip
                 sudo pip3 install selenium==3.141.0 
                 export PATH=$PATH:/usr/lib/chromium-browser/
-                cd $(Pipeline.Workspace)/selenium
-                unzip -o $(Pipeline.Workspace)/selenium/$(Build.BuildId)-selenium-tests -d .
+                cd $(Pipeline.Workspace)/drop-ui-tests
+                unzip -o $(Pipeline.Workspace)/drop-ui-tests/$(Build.BuildId)-ui-tests.zip -d .
           - bash: |
-                cd $(Pipeline.Workspace)/s/automatedtesting/selenium
+                cd $(Pipeline.Workspace)/s
+                sudo mkdir /automatedtesting/selenium
                 rm -rf seleniumtestrun.log
                 pwd
                 python3 login.py
@@ -252,5 +253,5 @@ stages:
           - task: PublishPipelineArtifact@1
             displayName: Publish Selenium Result logs
             inputs:
-              targetPath: '$(Pipeline.Workspace)/selenium/seleniumtestrun.log'
+              targetPath: '$(Pipeline.Workspace)/drop-ui-tests/seleniumtestrun.log'
               artifactName: 'SeleniumTestResult'
