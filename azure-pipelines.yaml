@@ -247,6 +247,7 @@ stages:
                 pwd
                 python3 login.py
                 ls -lah
+                #sudo mkdir /var/log/selenium
                 sudo cat seleniumtestrun.log
                 sudo cp seleniumtestrun.log /var/log/selenium/
             displayName: Run Selenium Test-Suite
