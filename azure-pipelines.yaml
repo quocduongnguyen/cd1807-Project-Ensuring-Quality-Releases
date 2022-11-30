@@ -175,6 +175,17 @@ stages:
       displayName: 'Publish JMeter'
       artifact: drop-jmeter
 
+    - task: ArchiveFiles@2
+      displayName: 'Archive Postman tests'
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-postman-tests.zip'
+    - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-postman-tests.zip
+      displayName: 'Publish Postman Tests'
+      artifact: drop-postman
+
 #--------------------------------------------#  
 # DEPLOYMENT STAGE
 #--------------------------------------------#    
@@ -271,16 +282,6 @@ stages:
       displayName: Install Node v16.X
       inputs:
         versionSpec: '16.x'
-    - task: ArchiveFiles@2
-      displayName: 'Archive Postman tests'
-      inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-postman-tests.zip'
-    - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-postman-tests.zip
-      displayName: 'Upload Postman Tests'
-      artifact: postman
     - download: current
       displayName: Download postman
       artifact: postman
