@@ -284,7 +284,7 @@ stages:
         versionSpec: '16.x'
     - download: current
       displayName: Download postman
-      artifact: postman
+      artifact: drop-postman
     - task: CmdLine@2
       displayName: Install Newman
       inputs:
