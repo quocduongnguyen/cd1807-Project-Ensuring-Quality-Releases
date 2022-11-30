@@ -242,7 +242,7 @@ stages:
                 cd $(Pipeline.Workspace)/drop-ui-tests
                 unzip -o $(Pipeline.Workspace)/drop-ui-tests/$(Build.BuildId)-uitests.zip -d .
           - bash: |
-                #cd $(Pipeline.Workspace)/s/automatedtesting/selenium
+                cd $(Pipeline.Workspace)/drop-ui-tests
                 rm -rf seleniumtestrun.log
                 pwd
                 python3 login.py
