@@ -245,7 +245,7 @@ stages:
                 cd $(Pipeline.Workspace)/drop-ui-tests
                 #rm -rf seleniumtestrun.log
                 pwd
-                python3 login.py
+                python3 login.py > seleniumtestrun.log
                 ls -lah
                 #sudo mkdir /var/log/selenium
                 sudo cat seleniumtestrun.log
