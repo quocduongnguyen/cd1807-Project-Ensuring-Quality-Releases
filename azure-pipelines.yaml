@@ -226,133 +226,18 @@ stages:
             artifact: drop-ui-tests    # ToDo: Change/provide a name
             
           - task: Bash@3
+            displayName: 'Install Selenium'
             inputs:
               targetType: 'inline'
-              script: |           
-                # ToDo: Install Selenium, Chromium-browser & Chromedriver, if not already in the custom VM image. 
+              script: |
                 #! /bin/bash
                 
-                sudo apt-get upgrade -y
-                sudo apt-get install unzip -y
+                sudo apt-get update -y
+                sudo apt-get install python3-pip -y
                 sudo apt-get install -y chromium-browser
-                pip install selenium
-                
-                #  ToDo: Add chromedriver executable to path
-                # wget https://chromedriver.storage.googleapis.com/106.0.5249.61/chromedriver_linux64.zip
-                # unzip chromedriver_linux64.zip 
-                # sudo chmod +x chromedriver
-                # mv chromedriver $(System.DefaultWorkingDirectory)/automatedtesting/selenium/
-                # chromium-browser -version
-                # chromedriver --version
-- stage: IntegrationTests
-  displayName: Integration Tests
-  jobs:
-  - job: PostmanTests
-    displayName: Postman Tests
-    steps: 
-    - task: NodeTool@0
-      displayName: Install Node v16.X
-      inputs:
-        versionSpec: '16.x'
-        checkLatest: true
-    - task: CmdLine@2
-      displayName: Install Newman
-      inputs:
-        script: 'npm install -g newman'          # ToDo: Write your commands to install newman
-        workingDirectory: $(System.DefaultWorkingDirectory)
-    - task: CmdLine@2
-      displayName: Run Regression Tests
-      inputs:
-        script: 'newman run automatedtesting/postman/RegressionTest.json --delay-request 2000 --bail newman -x --reporters cli,junit --reporter-junit-export Results/RegressionTests.xml --suppress-exit-code'
-        workingDirectory: '$(System.DefaultWorkingDirectory)'
-      continueOnError: true
-    - task: CmdLine@2
-      displayName: Run Data Validation Tests
-      inputs:
-        script: 'newman run automatedtesting/postman/ValidationTest.json --delay-request 2000 --bail newman -x --reporters cli,junit --reporter-junit-export Results/DataValidationTests.xml --suppress-exit-code'
-        workingDirectory: '$(System.DefaultWorkingDirectory)'
-      continueOnError: true
-    - task: CmdLine@2
-      inputs:
-        script: 'ls -la Results/'
-        workingDirectory: '$(System.DefaultWorkingDirectory)'
-    - task: PublishTestResults@2
-      displayName: Publish Test Reports
-      condition: always()
-      inputs:
-        testResultsFormat: 'JUnit'
-        testResultsFiles: '$(System.DefaultWorkingDirectory)/Results/*.xml'
-  - job: JmeterTests
-    displayName: Jmeter Tests
-    steps: 
-    - task: CmdLine@2
-      displayName: Install Jmeter
-      inputs:
-        script: |
-          sudo apt-get install openjdk-11-jre-headless -y
-          java -version
-          wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.4.tgz -O jmeter.tgz
-          tar xzvf jmeter.tgz
-          apache-jmeter-5.4/bin/jmeter --version
-          # create log directory
-          mkdir -p log/jmeter
-          ls
-        workingDirectory: $(System.DefaultWorkingDirectory)
-
-    - bash: |
-        $(System.DefaultWorkingDirectory)/apache-jmeter-5.4/bin/jmeter -n -t automatedtesting/jmeter/StressTestSuite.jmx \
-                                       -l $(System.DefaultWorkingDirectory)/log/jmeter/stress-test-result.csv \
-                                       -e -f -o $(System.DefaultWorkingDirectory)/log/jmeter/stress-test-html-report \
-                                       -j $(System.DefaultWorkingDirectory)/log/jmeter/jmeter-stress-test.log
-      displayName: JMeter stress test
-      workingDirectory: '$(System.DefaultWorkingDirectory)'
-    - bash: |
-        $(System.DefaultWorkingDirectory)/apache-jmeter-5.4/bin/jmeter -n -t automatedtesting/jmeter/EnduranceTestSuite.jmx \
-                                       -l $(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-result.csv \
-                                       -e -f -o $(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-html-report \
-                                       -j $(System.DefaultWorkingDirectory)/log/jmeter/jmeter-endurance-test.log
-      displayName: JMeter Endurance test
-      workingDirectory: '$(System.DefaultWorkingDirectory)'
-    - task: ArchiveFiles@2
-      displayName: Archive JMeter stress test HTML report
-      inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/log/jmeter/stress-test-html-report'
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(System.DefaultWorkingDirectory)/log/jmeter/stress-test-html-report-$(Build.BuildId).zip'
-        verbose: true
-    - task: ArchiveFiles@2
-      displayName: Archive JMeter endurance test HTML report
-      inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-html-report'
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-html-report-$(Build.BuildId).zip'
-        verbose: true
-    - task: PublishPipelineArtifact@1
-      displayName: Publish JMeter logs
-      inputs:
-        targetPath: '$(System.DefaultWorkingDirectory)/log/jmeter'
-        artifactName: 'drop-jmeter-logs'
-  - job: UiTests
-    displayName: Ui Tests
-    steps: 
-    - task: CmdLine@2
-      displayName: Ui Tests
-      inputs:
-        script: |
-          wget https://chromedriver.storage.googleapis.com/106.0.5249.61/chromedriver_linux64.zip
-          unzip chromedriver_linux64.zip 
-          sudo chmod +x chromedriver
-          mv chromedriver ./automatedtesting/selenium/
-          chromium-browser -version
-          ./automatedtesting/selenium/chromedriver --version
-          python automatedtesting/selenium/test.py > ui.log
-          sudo mkdir /var/logs
-          sudo cp ui.log /var/logs/
-        workingDirectory: $(System.DefaultWorkingDirectory)
-    - task: PublishPipelineArtifact@1
-      displayName: Publish selenium logs
-      inputs:
-        targetPath: '$(System.DefaultWorkingDirectory)/ui.log'
-        artifactName: 'drop-selenium-logs'
+                sudo apt-get install -y chromium-chromedriver
+                sudo python3 -m pip install --upgrade pip
+                sudo pip3 install selenium==3.141.0 
+                export PATH=$PATH:/usr/lib/chromium-browser/
+                cd $(Pipeline.Workspace)/selenium
+                unzip -o $(Pipeline.Workspace)/selenium/$(Build.BuildId)-selenium-tests -d .
