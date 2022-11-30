@@ -210,49 +210,95 @@ stages:
           #       powershell -command
           #     workingDirectory: $(Pipeline.Workspace)/drop-fakerestapi      
               
-  #--------------------------------------------#  
-  # Selenium | Functional UI Tests
-  # ToDo: 
-  - deployment: VMDeploy
-    displayName: Selenium Tests
-    environment:
-      name:  $(environmentName)       # ToDo: Change/provide a name
-      resourceType: VirtualMachine
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - download: current
-            artifact: drop-ui-tests    # ToDo: Change/provide a name
-          - task: Bash@3
-            displayName: 'Install Selenium'
-            inputs:
-              targetType: 'inline'
-              script: |
-                #! /bin/bash
+  # #--------------------------------------------#  
+  # # Selenium | Functional UI Tests
+  # # ToDo: 
+  # - deployment: VMDeploy
+  #   displayName: Selenium Tests
+  #   environment:
+  #     name:  $(environmentName)       # ToDo: Change/provide a name
+  #     resourceType: VirtualMachine
+  #   strategy:
+  #     runOnce:
+  #       deploy:
+  #         steps:
+  #         - download: current
+  #           artifact: drop-ui-tests    # ToDo: Change/provide a name
+  #         - task: Bash@3
+  #           displayName: 'Install Selenium'
+  #           inputs:
+  #             targetType: 'inline'
+  #             script: |
+  #               #! /bin/bash
                 
-                sudo apt-get update -y
-                sudo apt-get install python3-pip -y
-                sudo apt-get install unzip -y
-                sudo apt-get install -y chromium-browser
-                sudo apt-get install -y chromium-chromedriver
-                sudo python3 -m pip install --upgrade pip
-                sudo pip3 install selenium==3.141.0 
-                export PATH=$PATH:/usr/lib/chromium-browser/
-                cd $(Pipeline.Workspace)/drop-ui-tests
-                unzip -o $(Pipeline.Workspace)/drop-ui-tests/$(Build.BuildId)-uitests.zip -d .
-          - bash: |
-                cd $(Pipeline.Workspace)/drop-ui-tests
-                #rm -rf seleniumtestrun.log
-                pwd
-                python3 login.py > seleniumtestrun.log
-                ls -lah
-                #sudo mkdir /var/log/selenium
-                sudo cat seleniumtestrun.log
-                sudo cp seleniumtestrun.log /var/log/selenium/
-            displayName: Run Selenium Test-Suite
-          - task: PublishPipelineArtifact@1
-            displayName: Publish Selenium Result logs
-            inputs:
-              targetPath: '$(Pipeline.Workspace)/drop-ui-tests/seleniumtestrun.log'
-              artifactName: 'SeleniumTestResult'
+  #               sudo apt-get update -y
+  #               sudo apt-get install python3-pip -y
+  #               sudo apt-get install unzip -y
+  #               sudo apt-get install -y chromium-browser
+  #               sudo apt-get install -y chromium-chromedriver
+  #               sudo python3 -m pip install --upgrade pip
+  #               sudo pip3 install selenium==3.141.0 
+  #               export PATH=$PATH:/usr/lib/chromium-browser/
+  #               cd $(Pipeline.Workspace)/drop-ui-tests
+  #               unzip -o $(Pipeline.Workspace)/drop-ui-tests/$(Build.BuildId)-uitests.zip -d .
+  #         - bash: |
+  #               cd $(Pipeline.Workspace)/drop-ui-tests
+  #               #rm -rf seleniumtestrun.log
+  #               pwd
+  #               python3 login.py > seleniumtestrun.log
+  #               ls -lah
+  #               #sudo mkdir /var/log/selenium
+  #               sudo cat seleniumtestrun.log
+  #               sudo cp seleniumtestrun.log /var/log/selenium/
+  #           displayName: Run Selenium Test-Suite
+  #         - task: PublishPipelineArtifact@1
+  #           displayName: Publish Selenium Result logs
+  #           inputs:
+  #             targetPath: '$(Pipeline.Workspace)/drop-ui-tests/seleniumtestrun.log'
+  #             artifactName: 'SeleniumTestResult'
+
+#--------------------------------------------#  
+# TEST POSTMAN
+#--------------------------------------------#    
+- stage: Test
+  condition: true
+  jobs:
+  - job: TestWithPostman
+    condition: true
+    displayName: 'Test Postman'
+    steps:
+    - task: CmdLine@2
+      displayName: Install Newman
+      inputs:
+        script: |
+          mkdir ~/.npm-global
+          npm config set prefix '~/.npm-global'
+          export PATH=~/.npm-global/bin:$PATH
+          source ~/.profile
+          npm install -g newman
+        workingDirectory: $(System.DefaultWorkingDirectory)
+
+   # Postman Data Validation Test Suite    
+   # ToDo: Verify the working directory and the newman scripts
+    - task: CmdLine@2
+      condition: true
+      displayName: Run Data Validation Tests
+      continueOnError: true
+      inputs:
+        script: |
+          export PATH=~/.npm-global/bin:$PATH
+          chmod 744 ~/.npm-global/bin/newman
+          newman run validation-data-test.json --reporters cli,junit --reporter-junit-export results\validation-data-test.xml
+        workingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
+
+   # Postman Regression Test Suite    
+   # ToDo: Update the command and verify the working directory
+    - task: CmdLine@2
+      displayName: Run Regression Tests
+      continueOnError: true
+      inputs:
+        script: |
+          export PATH=~/.npm-global/bin:$PATH
+          chmod 744 ~/.npm-global/bin/newman
+          newman run regression-test.json --reporters cli,junit --reporter-junit-export results\regression-test.xml
+        workingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
