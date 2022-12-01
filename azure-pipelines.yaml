@@ -221,20 +221,20 @@ stages:
           #       powershell -command
           #     workingDirectory: $(Pipeline.Workspace)/drop-fakerestapi      
               
-  # #--------------------------------------------#  
-  # # Selenium | Functional UI Tests
-  # # ToDo: 
-  # - deployment: VMDeploy
-  #   displayName: Selenium Tests
-  #   environment:
-  #     name:  $(environmentName)       # ToDo: Change/provide a name
-  #     resourceType: VirtualMachine
-  #   strategy:
-  #     runOnce:
-  #       deploy:
-  #         steps:
-  #         - download: current
-  #           artifact: drop-ui-tests    # ToDo: Change/provide a name
+  #--------------------------------------------#  
+  # Selenium | Functional UI Tests
+  # ToDo: 
+  - deployment: VMDeploy
+    displayName: Selenium Tests
+    environment:
+      name:  $(environmentName)       # ToDo: Change/provide a name
+      resourceType: VirtualMachine
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop-postman
   #         - task: Bash@3
   #           displayName: 'Install Selenium'
   #           inputs:
