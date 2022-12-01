@@ -178,7 +178,7 @@ stages:
     - task: ArchiveFiles@2
       displayName: 'Archive Postman tests'
       inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/selenium'
         includeRootFolder: false
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-postman.zip'
