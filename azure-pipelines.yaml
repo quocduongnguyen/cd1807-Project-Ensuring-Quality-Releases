@@ -182,7 +182,7 @@ stages:
         includeRootFolder: false
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-postman.zip'
-    - publish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-postman.zip
+    - publish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-postman.zip'
       displayName: 'Publish Postman'
       artifact: drop-postman
 
