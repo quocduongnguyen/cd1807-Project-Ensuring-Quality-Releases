@@ -221,52 +221,52 @@ stages:
           #       powershell -command
           #     workingDirectory: $(Pipeline.Workspace)/drop-fakerestapi      
               
-  # #--------------------------------------------#  
-  # # Selenium | Functional UI Tests
-  # # ToDo: 
-  # - deployment: VMDeploy
-  #   displayName: Selenium Tests
-  #   environment:
-  #     name:  $(environmentName)       # ToDo: Change/provide a name
-  #     resourceType: VirtualMachine
-  #   strategy:
-  #     runOnce:
-  #       deploy:
-  #         steps:
-  #         - download: current
-  #           artifact: drop-ui-tests    # ToDo: Change/provide a name
-  #         - task: Bash@3
-  #           displayName: 'Install Selenium'
-  #           inputs:
-  #             targetType: 'inline'
-  #             script: |
-  #               #! /bin/bash
+  #--------------------------------------------#  
+  # Selenium | Functional UI Tests
+  # ToDo: 
+  - deployment: VMDeploy
+    displayName: Selenium Tests
+    environment:
+      name:  $(environmentName)       # ToDo: Change/provide a name
+      resourceType: VirtualMachine
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop-ui-tests    # ToDo: Change/provide a name
+          - task: Bash@3
+            displayName: 'Install Selenium'
+            inputs:
+              targetType: 'inline'
+              script: |
+                #! /bin/bash
                 
-  #               sudo apt-get update -y
-  #               sudo apt-get install python3-pip -y
-  #               sudo apt-get install unzip -y
-  #               sudo apt-get install -y chromium-browser
-  #               sudo apt-get install -y chromium-chromedriver
-  #               sudo python3 -m pip install --upgrade pip
-  #               sudo pip3 install selenium==3.141.0 
-  #               export PATH=$PATH:/usr/lib/chromium-browser/
-  #               cd $(Pipeline.Workspace)/drop-ui-tests
-  #               unzip -o $(Pipeline.Workspace)/drop-ui-tests/$(Build.BuildId)-uitests.zip -d .
-  #         - bash: |
-  #               cd $(Pipeline.Workspace)/drop-ui-tests
-  #               #rm -rf seleniumtestrun.log
-  #               pwd
-  #               python3 login.py > seleniumtestrun.log
-  #               ls -lah
-  #               #sudo mkdir /var/log/selenium
-  #               sudo cat seleniumtestrun.log
-  #               sudo cp seleniumtestrun.log /var/log/selenium/
-  #           displayName: Run Selenium Test-Suite
-  #         - task: PublishPipelineArtifact@1
-  #           displayName: Publish Selenium Result logs
-  #           inputs:
-  #             targetPath: '$(Pipeline.Workspace)/drop-ui-tests/seleniumtestrun.log'
-  #             artifactName: 'SeleniumTestResult'
+                sudo apt-get update -y
+                sudo apt-get install python3-pip -y
+                sudo apt-get install unzip -y
+                sudo apt-get install -y chromium-browser
+                sudo apt-get install -y chromium-chromedriver
+                sudo python3 -m pip install --upgrade pip
+                sudo pip3 install selenium==3.141.0 
+                export PATH=$PATH:/usr/lib/chromium-browser/
+                cd $(Pipeline.Workspace)/drop-ui-tests
+                unzip -o $(Pipeline.Workspace)/drop-ui-tests/$(Build.BuildId)-uitests.zip -d .
+          - bash: |
+                cd $(Pipeline.Workspace)/drop-ui-tests
+                #rm -rf seleniumtestrun.log
+                pwd
+                python3 login.py > seleniumtestrun.log
+                ls -lah
+                #sudo mkdir /var/log/selenium
+                sudo cat seleniumtestrun.log
+                sudo cp seleniumtestrun.log /var/log/selenium/
+            displayName: Run Selenium Test-Suite
+          - task: PublishPipelineArtifact@1
+            displayName: Publish Selenium Result logs
+            inputs:
+              targetPath: '$(Pipeline.Workspace)/drop-ui-tests/seleniumtestrun.log'
+              artifactName: 'SeleniumTestResult'
 
 #--------------------------------------------#  
 # TEST POSTMAN
