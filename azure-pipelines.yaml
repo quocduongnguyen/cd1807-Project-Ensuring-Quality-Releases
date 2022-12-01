@@ -178,7 +178,7 @@ stages:
     - task: ArchiveFiles@2
       displayName: 'Archive Postman tests'
       inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/selenium'
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
         includeRootFolder: false
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-postman.zip'
@@ -297,7 +297,7 @@ stages:
           nodejs --version
           npm install -g newman
           cd $(Pipeline.Workspace)/postman
-          unzip -o $(Pipeline.Workspace)/postman/$(Build.BuildId)-postman -d .
+          unzip -o $(Pipeline.Workspace)/drop-postman/$(Build.BuildId)-postman -d .
         workingDirectory: $(System.DefaultWorkingDirectory)
 
    # Postman Data Validation Test Suite    
