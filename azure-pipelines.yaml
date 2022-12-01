@@ -181,9 +181,9 @@ stages:
         rootFolderOrFile: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
         includeRootFolder: false
         archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-postman-tests.zip'
-    - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-postman-tests.zip
-      displayName: 'Publish Postman Tests'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-postman.zip'
+    - publish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-postman.zip
+      displayName: 'Publish Postman'
       artifact: drop-postman
 
 #--------------------------------------------#  
@@ -283,7 +283,7 @@ stages:
       inputs:
         versionSpec: '16.x'
     - download: current
-      #displayName: Download postman
+      displayName: Download postman
       artifact: drop-postman
     - task: CmdLine@2
       displayName: Install Newman
@@ -297,7 +297,7 @@ stages:
           nodejs --version
           npm install -g newman
           cd $(Pipeline.Workspace)/postman
-          unzip -o $(Pipeline.Workspace)/postman/$(Build.BuildId)-postman-tests -d .
+          unzip -o $(Pipeline.Workspace)/postman/$(Build.BuildId)-postman -d .
         workingDirectory: $(System.DefaultWorkingDirectory)
 
    # Postman Data Validation Test Suite    
