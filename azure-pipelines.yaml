@@ -268,122 +268,122 @@ stages:
               targetPath: '$(Pipeline.Workspace)/drop-ui-tests/seleniumtestrun.log'
               artifactName: 'SeleniumTestResult'
 
-#--------------------------------------------#  
-# TEST POSTMAN
-#--------------------------------------------#    
-- stage: Test
-  condition: true
-  jobs:
-  - job: TestWithPostman
-    condition: true
-    displayName: 'Test Postman'
-    steps:
-    - task: NodeTool@0
-      displayName: Install Node v16.X
-      inputs:
-        versionSpec: '16.x'
-    - download: current
-      displayName: Download postman
-      artifact: drop-postman
-    - task: CmdLine@2
-      displayName: Install Newman
-      inputs:
-        script: |
-          #mkdir ~/.npm-global
-          npm config set prefix '~/.npm-global'
-          export PATH=~/.npm-global/bin:$PATH
-          source ~/.profile
-          sudo apt install nodejs npm -y
-          nodejs --version
-          npm install -g newman
-          cd $(Pipeline.Workspace)/drop-postman
-          unzip -o $(Pipeline.Workspace)/drop-postman/$(Build.BuildId)-postman -d .
-        workingDirectory: $(System.DefaultWorkingDirectory)
+# #--------------------------------------------#  
+# # TEST POSTMAN
+# #--------------------------------------------#    
+# - stage: Test
+#   condition: true
+#   jobs:
+#   - job: TestWithPostman
+#     condition: true
+#     displayName: 'Test Postman'
+#     steps:
+#     - task: NodeTool@0
+#       displayName: Install Node v16.X
+#       inputs:
+#         versionSpec: '16.x'
+#     - download: current
+#       displayName: Download postman
+#       artifact: drop-postman
+#     - task: CmdLine@2
+#       displayName: Install Newman
+#       inputs:
+#         script: |
+#           #mkdir ~/.npm-global
+#           npm config set prefix '~/.npm-global'
+#           export PATH=~/.npm-global/bin:$PATH
+#           source ~/.profile
+#           sudo apt install nodejs npm -y
+#           nodejs --version
+#           npm install -g newman
+#           cd $(Pipeline.Workspace)/drop-postman
+#           unzip -o $(Pipeline.Workspace)/drop-postman/$(Build.BuildId)-postman -d .
+#         workingDirectory: $(System.DefaultWorkingDirectory)
 
-   # Postman Data Validation Test Suite    
-   # ToDo: Verify the working directory and the newman scripts
-    - task: CmdLine@2
-      condition: true
-      displayName: Run Data Validation Tests
-      continueOnError: true
-      inputs:
-        script: |
-          export PATH=~/.npm-global/bin:$PATH
-          chmod 744 ~/.npm-global/bin/newman
-          newman run ValidationTest.json --reporters cli,junit --reporter-junit-export results\ValidationTest.xml
-        workingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
+#    # Postman Data Validation Test Suite    
+#    # ToDo: Verify the working directory and the newman scripts
+#     - task: CmdLine@2
+#       condition: true
+#       displayName: Run Data Validation Tests
+#       continueOnError: true
+#       inputs:
+#         script: |
+#           export PATH=~/.npm-global/bin:$PATH
+#           chmod 744 ~/.npm-global/bin/newman
+#           newman run ValidationTest.json --reporters cli,junit --reporter-junit-export results\ValidationTest.xml
+#         workingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
 
-   # Postman Regression Test Suite    
-   # ToDo: Update the command and verify the working directory
-    - task: CmdLine@2
-      displayName: Run Regression Tests
-      continueOnError: true
-      inputs:
-        script: |
-          export PATH=~/.npm-global/bin:$PATH
-          chmod 744 ~/.npm-global/bin/newman
-          newman run RegressionTest.json --reporters cli,junit --reporter-junit-export results\RegressionTest.xml
-        workingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
-   # Postman - Publish Results 
-   # ToDo: Complete the task as explained here: https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/test/publish-test-results?view=azure-devops&tabs=trx%2Cyaml#yaml-snippet
-    - task: PublishTestResults@2
-      displayName: 'Publish test result'
-      inputs:
-        testResultsFormat: 'JUnit'
-        testResultsFiles: '**/*Test.xml'
-        #searchFolder: '$(System.DefaultWorkingDirectory)/automatedtesting/postman/results'
-        mergeTestResults: true
-        testRunTitle: 'Postman regression and data validation test'
-  # TEST JMETER
-  - job: JmeterTests
-    displayName: Jmeter Tests
-    steps: 
-    - task: CmdLine@2
-      displayName: Install Jmeter
-      inputs:
-        script: |
-          sudo apt-get install openjdk-11-jre-headless -y
-          java -version
-          wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.4.tgz -O jmeter.tgz
-          tar xzvf jmeter.tgz
-          apache-jmeter-5.4/bin/jmeter --version
-          # create log directory
-          mkdir -p log/jmeter
-          ls
-        workingDirectory: $(System.DefaultWorkingDirectory)
+#    # Postman Regression Test Suite    
+#    # ToDo: Update the command and verify the working directory
+#     - task: CmdLine@2
+#       displayName: Run Regression Tests
+#       continueOnError: true
+#       inputs:
+#         script: |
+#           export PATH=~/.npm-global/bin:$PATH
+#           chmod 744 ~/.npm-global/bin/newman
+#           newman run RegressionTest.json --reporters cli,junit --reporter-junit-export results\RegressionTest.xml
+#         workingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
+#    # Postman - Publish Results 
+#    # ToDo: Complete the task as explained here: https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/test/publish-test-results?view=azure-devops&tabs=trx%2Cyaml#yaml-snippet
+#     - task: PublishTestResults@2
+#       displayName: 'Publish test result'
+#       inputs:
+#         testResultsFormat: 'JUnit'
+#         testResultsFiles: '**/*Test.xml'
+#         #searchFolder: '$(System.DefaultWorkingDirectory)/automatedtesting/postman/results'
+#         mergeTestResults: true
+#         testRunTitle: 'Postman regression and data validation test'
+#   # TEST JMETER
+#   - job: JmeterTests
+#     displayName: Jmeter Tests
+#     steps: 
+#     - task: CmdLine@2
+#       displayName: Install Jmeter
+#       inputs:
+#         script: |
+#           sudo apt-get install openjdk-11-jre-headless -y
+#           java -version
+#           wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.4.tgz -O jmeter.tgz
+#           tar xzvf jmeter.tgz
+#           apache-jmeter-5.4/bin/jmeter --version
+#           # create log directory
+#           mkdir -p log/jmeter
+#           ls
+#         workingDirectory: $(System.DefaultWorkingDirectory)
 
-    - bash: |
-        $(System.DefaultWorkingDirectory)/apache-jmeter-5.4/bin/jmeter -n -t automatedtesting/jmeter/StressTest.jmx \
-                                        -l $(System.DefaultWorkingDirectory)/log/jmeter/stress-test-result.csv \
-                                        -e -f -o $(System.DefaultWorkingDirectory)/log/jmeter/stress-test-html-report \
-                                        -j $(System.DefaultWorkingDirectory)/log/jmeter/jmeter-stress-test.log
-      displayName: JMeter stress test
-      workingDirectory: '$(System.DefaultWorkingDirectory)'
-    - bash: |
-        $(System.DefaultWorkingDirectory)/apache-jmeter-5.4/bin/jmeter -n -t automatedtesting/jmeter/EnduranceTest.jmx \
-                                        -l $(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-result.csv \
-                                        -e -f -o $(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-html-report \
-                                        -j $(System.DefaultWorkingDirectory)/log/jmeter/jmeter-endurance-test.log
-      displayName: JMeter Endurance test
-      workingDirectory: '$(System.DefaultWorkingDirectory)'
-    - task: ArchiveFiles@2
-      displayName: Archive JMeter stress test HTML report
-      inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/log/jmeter/stress-test-html-report'
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(System.DefaultWorkingDirectory)/log/jmeter/stress-test-html-report-$(Build.BuildId).zip'
-        verbose: true
-    - task: ArchiveFiles@2
-      displayName: Archive JMeter endurance test HTML report
-      inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-html-report'
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-html-report-$(Build.BuildId).zip'
-        verbose: true
-    - task: PublishPipelineArtifact@1
-      displayName: Publish JMeter logs
-      inputs:
-        targetPath: '$(System.DefaultWorkingDirectory)/log/jmeter'
-        artifactName: 'drop-jmeter-logs'
+#     - bash: |
+#         $(System.DefaultWorkingDirectory)/apache-jmeter-5.4/bin/jmeter -n -t automatedtesting/jmeter/StressTest.jmx \
+#                                         -l $(System.DefaultWorkingDirectory)/log/jmeter/stress-test-result.csv \
+#                                         -e -f -o $(System.DefaultWorkingDirectory)/log/jmeter/stress-test-html-report \
+#                                         -j $(System.DefaultWorkingDirectory)/log/jmeter/jmeter-stress-test.log
+#       displayName: JMeter stress test
+#       workingDirectory: '$(System.DefaultWorkingDirectory)'
+#     - bash: |
+#         $(System.DefaultWorkingDirectory)/apache-jmeter-5.4/bin/jmeter -n -t automatedtesting/jmeter/EnduranceTest.jmx \
+#                                         -l $(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-result.csv \
+#                                         -e -f -o $(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-html-report \
+#                                         -j $(System.DefaultWorkingDirectory)/log/jmeter/jmeter-endurance-test.log
+#       displayName: JMeter Endurance test
+#       workingDirectory: '$(System.DefaultWorkingDirectory)'
+#     - task: ArchiveFiles@2
+#       displayName: Archive JMeter stress test HTML report
+#       inputs:
+#         rootFolderOrFile: '$(System.DefaultWorkingDirectory)/log/jmeter/stress-test-html-report'
+#         includeRootFolder: false
+#         archiveType: 'zip'
+#         archiveFile: '$(System.DefaultWorkingDirectory)/log/jmeter/stress-test-html-report-$(Build.BuildId).zip'
+#         verbose: true
+#     - task: ArchiveFiles@2
+#       displayName: Archive JMeter endurance test HTML report
+#       inputs:
+#         rootFolderOrFile: '$(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-html-report'
+#         includeRootFolder: false
+#         archiveType: 'zip'
+#         archiveFile: '$(System.DefaultWorkingDirectory)/log/jmeter/endurance-test-html-report-$(Build.BuildId).zip'
+#         verbose: true
+#     - task: PublishPipelineArtifact@1
+#       displayName: Publish JMeter logs
+#       inputs:
+#         targetPath: '$(System.DefaultWorkingDirectory)/log/jmeter'
+#         artifactName: 'drop-jmeter-logs'
